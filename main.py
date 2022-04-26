@@ -1,6 +1,8 @@
 import pygame, os
 from random import randrange
 
+pygame.init()
+
 WIDTH,HEIGHT = 1600,900
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption("d(-_-)b")
@@ -23,11 +25,12 @@ def randomize_spawn(): # Randomize target spawn insinde display.. x == [0] y == 
     y = randrange(800)
     return x,y
 
-def add_targets(targets): # Append target to list with randomized x,y vector
-    spawn_point = randomize_spawn()
-    target = pygame.Rect(spawn_point[0], spawn_point[1], TARGET_HEIGHT,TARGET_WIDTH)
-    targets.append(target)
-       
+def add_targets(targets,target_amount): # Append target to list with randomized x,y vector
+    for i in range(target_amount):
+        spawn_point = randomize_spawn()
+        target = pygame.Rect(spawn_point[0], spawn_point[1], TARGET_HEIGHT,TARGET_WIDTH)
+        targets.append(target)
+
 def draw_borders(): # Draw black borders, delete? 
     BORDER_RIGHT = pygame.Rect(WIDTH- 8,0,10, HEIGHT)
     BORDER_LEFT = pygame.Rect(WIDTH- 1600,0, 10, HEIGHT)
@@ -44,44 +47,66 @@ def click_mouse_1(event): # Check if
         if event.button == 1:
             return True
 
-def handle_hit(event,targets): #Check if mouse cursor x & y axis inside targets 50px range
+def handle_hit(targets): #Check if mouse cursor x & y axis inside targets 50px range
     mouse_position = get_mouse_position()
-    if click_mouse_1(event):
-        for target in targets:
-            if mouse_position[0] >= target.x and mouse_position[0] <= target.x + 50 and mouse_position[1] >= target.y and mouse_position[1] <= target.y + 50:
-                    targets.remove(target)
-                    return True
+    for target in targets:
+        if mouse_position[0] >= target.x and mouse_position[0] <= target.x + 50 and mouse_position[1] >= target.y and mouse_position[1] <= target.y + 50:
+                targets.remove(target)
+                return True
     
-def draw_window(targets): #Draw everything
+def draw_window(targets,text_score, text_accuracy): #Draw everything
     WIN.fill(WHITE)
     for target in targets:
         WIN.blit(TARGET, (target.x, target.y))
         
+    WIN.blit(text_score, (WIDTH - 90 , 25))
+    WIN.blit(text_accuracy, (WIDTH - 90 , 70))
     draw_borders()
     pygame.display.update()
 
 def main():
-
+    click_amount = 0
+    game_over = False
     targets = []
+    target_amount = 1
     score = 0
-    timer = 0
-
-    timer_event = pygame.USEREVENT + 0
+    timer = 1
+    hit_accuracy = 0
+    font = pygame.font.SysFont(None, 50)
+    timer_event = pygame.USEREVENT + 1
     pygame.time.set_timer(timer_event, 1000) # 1000ms
+    
     clock = pygame.time.Clock() # Game running speed (FPS)
     run = True
     while run:
+        
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             elif event.type == timer_event:
-                add_targets(targets)
+                add_targets(targets, target_amount)
                 timer += 1
-            if handle_hit(event, targets):
-                score += 1
-            
-        draw_window(targets)
+                if timer % 25 == 0:
+                    target_amount += 1
+            if click_mouse_1(event):
+                click_amount += 1
+                hit_accuracy = score / click_amount
+                if handle_hit(targets):
+                    score += 1
+                    hit_accuracy = score / click_amount
+                    
+           
+            if len(targets) > 25:
+                game_over = True
+                print(game_over)
+                
+        text_accuracy = font.render(str(hit_accuracy) + "%", True, (BLACK))  
+        text_score = font.render(str(score), True, (BLACK))
+        draw_window(targets,text_score, text_accuracy)
+
+           
+                
         
     pygame.quit()
     
