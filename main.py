@@ -3,7 +3,7 @@ from random import randrange
 
 pygame.init()
 
-WIDTH,HEIGHT = 1600,900
+WIDTH,HEIGHT = 1280,720
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption("d(-_-)b")
 
@@ -21,8 +21,8 @@ BULLET_WIDTH, BULLET_HEIGHT = 50,50
 BULLET = pygame.image.load(os.path.join("assets", "CharFaceBackward.png"))
 
 def randomize_spawn(): # Randomize target spawn insinde display.. x == [0] y == [1]    
-    x = randrange(1500)
-    y = randrange(800)
+    x = randrange(WIDTH - 100)
+    y = randrange(HEIGHT - 100)
     return x,y
 
 def add_targets(targets,target_amount): # Append target to list with randomized x,y vector
@@ -30,12 +30,6 @@ def add_targets(targets,target_amount): # Append target to list with randomized 
         spawn_point = randomize_spawn()
         target = pygame.Rect(spawn_point[0], spawn_point[1], TARGET_HEIGHT,TARGET_WIDTH)
         targets.append(target)
-
-def draw_borders(): # Draw black borders, delete? 
-    BORDER_RIGHT = pygame.Rect(WIDTH- 8,0,10, HEIGHT)
-    BORDER_LEFT = pygame.Rect(WIDTH- 1600,0, 10, HEIGHT)
-    pygame.draw.rect(WIN, BLACK, BORDER_RIGHT)
-    pygame.draw.rect(WIN, BLACK, BORDER_LEFT)
 
 def get_mouse_position(): # current mouse x,y axis
     if pygame.mouse.get_pressed:
@@ -53,15 +47,18 @@ def handle_hit(targets): #Check if mouse cursor x & y axis inside targets 50px r
         if mouse_position[0] >= target.x and mouse_position[0] <= target.x + 50 and mouse_position[1] >= target.y and mouse_position[1] <= target.y + 50:
                 targets.remove(target)
                 return True
-    
-def draw_window(targets,text_score, text_accuracy): #Draw everything
+
+def draw_window(targets,text_score, text_accuracy, game_over): #Draw everything
     WIN.fill(WHITE)
-    for target in targets:
-        WIN.blit(TARGET, (target.x, target.y))
-        
-    WIN.blit(text_score, (WIDTH - 90 , 25))
-    WIN.blit(text_accuracy, (WIDTH - 90 , 70))
-    draw_borders()
+    if game_over == False:
+        for target in targets:
+            WIN.blit(TARGET, (target.x, target.y))
+            
+        WIN.blit(text_score, (WIDTH - 90 , 25))
+        WIN.blit(text_accuracy, (WIDTH - 110 , 70))
+    else:
+        WIN.blit(text_score, (WIDTH - 90 , 25))
+
     pygame.display.update()
 
 def main():
@@ -96,18 +93,14 @@ def main():
                     score += 1
                     hit_accuracy = score / click_amount
                     
-           
             if len(targets) > 25:
                 game_over = True
-                print(game_over)
-                
-        text_accuracy = font.render(str(hit_accuracy) + "%", True, (BLACK))  
+      
+        text_accuracy = font.render(str(int(hit_accuracy * 100)) + "%", True, (BLACK))  
         text_score = font.render(str(score), True, (BLACK))
-        draw_window(targets,text_score, text_accuracy)
-
-           
-                
         
+        draw_window(targets,text_score, text_accuracy, game_over)
+
     pygame.quit()
     
 if __name__ == "__main__":
