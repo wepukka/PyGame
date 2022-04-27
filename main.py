@@ -1,69 +1,136 @@
-import pygame, os
-from random import randrange
 
+
+import pygame, sys;
+from pygame import *
+from TargetPractice import *
+from datetime import date
+from handleDb import *
+
+from index import * # https://github.com/eugene-eeo/tinyindex
+
+clock = pygame.time.Clock()
 pygame.init()
 
-WIDTH,HEIGHT = 1280,720
+today = date.today()
+FPS = 60 # ENOUGH FPS TO HANDLE MOUSE INPUT
+WIDTH, HEIGHT = 1600, 900
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
-pygame.display.set_caption("d(-_-)b")
 
-FPS = 60
+# BUTTON IMAGES
+OPTIONS_IMAGE = pygame.image.load(os.path.join("assets", "Options.png"))
+PLAY_IMAGE = pygame.image.load(os.path.join("assets", "Play.png"))
+MUTE = pygame.image.load(os.path.join("assets", "Mute.png"))
+UNMUTE = pygame.image.load(os.path.join("assets", "Unmute.png"))
 
-BLACK = (0,0,0)
+# GAME COLORS
 WHITE = (255, 255,255)
-YELLOW = (255,255,0)
-# TARGET DEFAULT WIDTH 50, HEIGHT 50 # RESIZE method = pygame.transform.scale(image, (width, height))
-TARGET_WIDTH, TARGET_HEIGHT = 50,50
-TARGET = pygame.image.load(os.path.join("assets", "Target.png"))
+BLACK = (0,0,0)
 
-# CHECK IF
-BULLET_WIDTH, BULLET_HEIGHT = 50,50
-BULLET = pygame.image.load(os.path.join("assets", "CharFaceBackward.png"))
+# FONTS FOR DRAW_TEXT FUNCTION
+font = pygame.font.SysFont(None, 20)
+big_font = pygame.font.SysFont(None, 40)
 
-def randomize_spawn(): # Randomize target spawn insinde display.. x == [0] y == [1]    
-    x = randrange(WIDTH - 100)
-    y = randrange(HEIGHT - 100)
-    return x,y
+def draw_text(text, font, color, surface, x, y):
+    textobj = font.render(text, 1, color)
+    textrect = textobj.get_rect()
+    textrect.topleft = (x, y)
+    surface.blit(textobj, textrect)
+    
+def draw_high_scores(hs_list): # TOP 3 SCORES
+    draw_text("TOP 3", big_font, WHITE, WIN, WIDTH/2 +400, HEIGHT/2-100)
+    draw_text("Score", big_font, WHITE, WIN, WIDTH/2 +300, HEIGHT/2-50)
+    draw_text("Accuracy", big_font, WHITE, WIN, WIDTH/2 + 500, HEIGHT/2-50)
+    HS_X = WIDTH/2 + 325
+    HS_Y = HEIGHT/2 
+    if len(hs_list) >= 3:
+        for i in range(3):
+            draw_text(str(hs_list[i]["score"]), big_font, WHITE, WIN, HS_X, HS_Y)
+            draw_text(str(int(hs_list[i]["accuracy"])) + "%", big_font, WHITE, WIN, HS_X + 200, HS_Y)
+            HS_Y += 50
+    
+hs_list = []
+idx = Index(db, 'score', reverse=True) # sort index by score
+for item in idx:
+    hs_list.append(item)
 
-def add_targets(targets,target_amount): # Append target to list with randomized x,y vector
-    for i in range(target_amount):
-        spawn_point = randomize_spawn()
-        target = pygame.Rect(spawn_point[0], spawn_point[1], TARGET_HEIGHT,TARGET_WIDTH)
-        targets.append(target)
+click = False
+def main_menu(): # LAUNCHES ON STARTUP
+    mixer.music.load(os.path.join("assets", "hayden-folker-cast-aside.wav"))
+    mixer.music.play(-1)
+    pygame.display.set_caption('MENU')
 
-def get_mouse_position(): # current mouse x,y axis
-    if pygame.mouse.get_pressed:
-        x,y = pygame.mouse.get_pos()
-        return x,y
-
-def click_mouse_1(event): # Check if 
-    if event.type == pygame.MOUSEBUTTONDOWN: # If mouse1 (Left click) is pressed
-        if event.button == 1:
-            return True
-
-def handle_hit(targets): #Check if mouse cursor x & y axis inside targets 50px range
-    mouse_position = get_mouse_position()
-    for target in targets:
-        if mouse_position[0] >= target.x and mouse_position[0] <= target.x + 50 and mouse_position[1] >= target.y and mouse_position[1] <= target.y + 50:
-                targets.remove(target)
-                return True
-
-def draw_window(targets,text_score, text_accuracy, game_over): #Draw everything
-    WIN.fill(WHITE)
-    if game_over == False:
-        for target in targets:
-            WIN.blit(TARGET, (target.x, target.y))
-            
-        WIN.blit(text_score, (WIDTH - 90 , 25))
-        WIN.blit(text_accuracy, (WIDTH - 110 , 70))
-    else:
-        WIN.blit(text_score, (WIDTH - 90 , 25))
-
-    pygame.display.update()
-
-def main():
+    while True:
+        WIN.fill((BLACK))
+        
+        draw_high_scores(hs_list)        
+        
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        button_1 = pygame.Rect(WIDTH/2-100, HEIGHT/2 -100, 200, 50)
+        button_2 = pygame.Rect(WIDTH/2-100, HEIGHT/2, 200, 50)
+        if button_1.collidepoint((mouse_x, mouse_y)):
+            if click:
+                play()
+        if button_2.collidepoint((mouse_x, mouse_y)):
+            if click:
+                options()
+         
+        WIN.blit(PLAY_IMAGE, (button_1.x, button_1.y))
+        WIN.blit(OPTIONS_IMAGE, (button_2.x, button_2.y))
+ 
+        click = False
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+        pygame.display.update()
+        clock.tick(FPS)
+  
+def options(): # Options for music
+    options_click = False
+    pygame.display.set_caption('OPTIONS')
+    running = True
+    while running:
+        WIN.fill((0,0,0))
+        draw_text('Options', big_font, (255, 255, 255), WIN, 20, 20)
+        draw_text('Music', big_font, (255, 255, 255), WIN, WIDTH-1400, HEIGHT-600)
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        button_1 = pygame.Rect(WIDTH-1450, HEIGHT/2-100, 200, 50)
+        button_2 = pygame.Rect(WIDTH-1450, HEIGHT/2, 200, 50)
+        
+        if button_1.collidepoint((mouse_x, mouse_y)): # STOP MUSIC
+            if options_click:
+                pygame.mixer.music.stop()
+        if button_2.collidepoint((mouse_x, mouse_y)): # PLAY MUSIC
+            if options_click:
+                pygame.mixer.music.play()
+                
+        options_click = False
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    running = False
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    options_click = True
+        WIN.blit(MUTE, (button_1.x, button_1.y))
+        WIN.blit(UNMUTE, (button_2.x, button_2.y))
+        pygame.display.update()
+        clock.tick(FPS)
+        
+        
+def play(): # Game
+    pygame.display.set_caption('Target Practice')
     click_amount = 0
-    game_over = False
     targets = []
     target_amount = 1
     score = 0
@@ -72,36 +139,42 @@ def main():
     font = pygame.font.SysFont(None, 50)
     timer_event = pygame.USEREVENT + 1
     pygame.time.set_timer(timer_event, 1000) # 1000ms
-    
-    clock = pygame.time.Clock() # Game running speed (FPS)
-    run = True
-    while run:
-        
-        clock.tick(FPS)
+    game_over = False
+    running = True
+    while running:
+        WIN.fill(BLACK)
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-            elif event.type == timer_event:
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key != 1: # other then mouse input will return to menu
+                    running = False
+                if event.key != 1 and game_over: # if game is over, save score
+                    save_score(score,hit_accuracy,today)
+                    running = False
+            elif event.type == timer_event: # every second add new target
                 add_targets(targets, target_amount)
                 timer += 1
-                if timer % 25 == 0:
+                if timer % 25 == 0: # every 25th second increase targets created by one
                     target_amount += 1
-            if click_mouse_1(event):
+            if click_mouse_1(event): # keep store of clicks
                 click_amount += 1
                 hit_accuracy = score / click_amount
-                if handle_hit(targets):
+                if handle_hit(targets): # keep store of score
                     score += 1
                     hit_accuracy = score / click_amount
                     
-            if len(targets) > 25:
+            if len(targets) > 3: # If targets > x in screen, game over
                 game_over = True
       
-        text_accuracy = font.render(str(int(hit_accuracy * 100)) + "%", True, (BLACK))  
-        text_score = font.render(str(score), True, (BLACK))
+        text = handle_text(font,score,hit_accuracy, game_over) # accuracy and score during game and game over
         
-        draw_window(targets,text_score, text_accuracy, game_over)
-
-    pygame.quit()
-    
+        draw_window(targets,text, game_over) # Render targets and texts
+        clock.tick(FPS)  
+ 
 if __name__ == "__main__":
-    main()
+    main_menu()
+    
+
+
