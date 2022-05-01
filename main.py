@@ -165,7 +165,7 @@ def play(): # Game
                     score += 1
                     hit_accuracy = score / click_amount
                     
-            if len(targets) > 3: # If targets > x in screen, game over
+            if len(targets) > 20: # If targets > x in screen, game over
                 game_over = True
       
         text = handle_text(font,score,hit_accuracy, game_over) # accuracy and score during game and game over
