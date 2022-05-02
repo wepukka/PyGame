@@ -137,7 +137,7 @@ Pienellä python taustalla ja muutamalla tutoriaalilla pääsi aika hyvin alkuun
 
 &emsp;&emsp;&emsp;&emsp;[FPS](#fps)
 
-$~~~~~~$[Lisäksi](#lisäksi)
+&emsp;&emsp;[Lisäksi](#lisäksi)
 
 [Käyttöönotto](#käyttöönotto)
 
