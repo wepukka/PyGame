@@ -18,14 +18,14 @@ Jotta pygame kirjastoa voidaan käyttöö tulee se asentaa, importoida ja alusta
 
 ## Renderöinti
 Pelin käynnistyessä aletaan renderöimään (piirtämään) [main_menu()](https://github.com/wepukka/PyGame/blob/main/main.py?plain1#L58-L104) funktiota, joka toimii pelin päävalikkona.
-Tällöin ruutu täytetään kuvalla tai vaikka pelkällä yhdellä värillä, jonka päälle sitten renderöidään kaikki muu. Huomasin myös että on hyvä määrittää leveys ja korkeus arvot muuttujiin, jotta niihin voidaan tarvittaessa viitata myöhemmin.
+Tällöin ruutu jolle on määritelty leveys ja korkeus arvot, täytetään kuvalla tai vaikka pelkällä yhdellä värillä, jonka päälle sitten renderöidään kaikki muu. Leveys ja korkeus hyvä määrittää muuttujiin jotta niihin voidaan viitata ohjelman myöhemmissä vaiheissa.
 
     WIDTH, HEIGHT = 1600, 900 # Määritellään haluttu leveys ja korkeus
     WIN = pygame.display.set_mode((WIDTH,HEIGHT)) # Asetetaan peli-ikkunan mitat
     WIN.fill((BLACK)) # Täytetään ruutu mustalla
 
 [main_menu()](https://github.com/wepukka/PyGame/blob/main/main.py?plain1#L58-L104) pyörii koko pelin ajan taustalla, ollaan sitten [Asetuksissa](https://github.com/wepukka/PyGame/blob/main/main.py?plain1#L106-L139) tai itse [Pelimuodossa](https://github.com/wepukka/PyGame/blob/main/main.py?plain1#L141-L184).
-Kun halutaan vaihtaa näkymää, aletaan uutta näkymää vain renderöimään päävalikon päälle.
+Kun halutaan vaihtaa näkymää, aletaan uutta näkymää renderöimään päävalikon päälle.
 
      if button_1.collidepoint((mouse_x, mouse_y)):
             if click:
@@ -131,11 +131,11 @@ Pienellä python taustalla ja muutamalla tutoriaalilla pääsi aika hyvin alkuun
 
 [Toteutus](#toteutus)
 
-$~~~~~~$[Renderöinti](#renderöinti)
+&nbsp;space[Renderöinti](#renderöinti)
 
-$~~~~~~$[Pelilogiikka](#pelilogiikka)
+&nbsp;space[Pelilogiikka](#pelilogiikka)
 
-$~~~~~~~~~~~~$[FPS](#fps)
+&nbsp;space&nbsp;space[FPS](#fps)
 
 $~~~~~~$[Lisäksi](#lisäksi)
 
@@ -143,14 +143,14 @@ $~~~~~~$[Lisäksi](#lisäksi)
 
 [Lähteet](#lähteet)
 
-[Credits](#credits)
+[Krediitit](#krediitit)
 # Lähteet
 - [pygame](https://www.pygame.org/docs/)
 - [tinydb](https://tinydb.readthedocs.io/en/latest/)
 - [Tech with Tim. Pygame in 90 minutes](https://www.youtube.com/watch?v=jO6qQDNa2UY&t=4092s&ab_channel=TechWithTim)
 - [CDcodes. Pygame Sprite Sheet Tutorial](https://www.youtube.com/watch?v=ePiMYe7JpJo&t=724s)
 
-# Credits
+# Krediitit
 **Musikki**
 
 Cast Aside by Hayden Folker | https://soundcloud.com/hayden-folker
