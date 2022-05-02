@@ -131,11 +131,11 @@ Pienellä python taustalla ja muutamalla tutoriaalilla pääsi aika hyvin alkuun
 
 [Toteutus](#toteutus)
 
-&nbsp;space[Renderöinti](#renderöinti)
+&emsp;&emsp;[Renderöinti](#renderöinti)
 
-&nbsp;space[Pelilogiikka](#pelilogiikka)
+&emsp;&emsp;[Pelilogiikka](#pelilogiikka)
 
-&nbsp;space&nbsp;space[FPS](#fps)
+&emsp;&emsp;&emsp;&emsp;[FPS](#fps)
 
 $~~~~~~$[Lisäksi](#lisäksi)
 
