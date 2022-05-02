@@ -2,7 +2,7 @@
 
 import pygame, sys;
 from pygame import *
-from TargetPractice import *
+from targetPractice import *
 from datetime import date
 from handleDb import *
 
