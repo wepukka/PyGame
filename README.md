@@ -104,7 +104,7 @@ Musiikin lisääminen oli tärkeä osa pelin luomista, jotta siihen saadaan edes
 
 **Tietokanta**
 
-Tietokantana parhailla pisteille toimii tinydb, joka toimii kätevästi lokaalisti. Pelin käynnistyessä tietokanta käydään läpi ja lajitellaan "scoren" mukaan. Kurssilla käytetty algorytmi sopi tähän mainiosti
+[Tietokantana](https://github.com/wepukka/PyGame/blob/main/handleDb.py) parhaille pisteille toimii tinydb, joka toimii kätevästi lokaalisti. Pelin käynnistyessä tietokanta käydään läpi ja lajitellaan "scoren" mukaan. Kurssilla käytetty algorytmi sopi tähän mainiosti
 
     scores = search_all() # SORT BY SCORE
     for i in range(len(scores)):
@@ -151,7 +151,7 @@ Pienellä python taustalla ja muutamalla tutoriaalilla pääsi aika hyvin alkuun
 - [CDcodes. Pygame Sprite Sheet Tutorial](https://www.youtube.com/watch?v=ePiMYe7JpJo&t=724s)
 
 # Krediitit
-**Musikki**
+**Musiikki**
 
 Cast Aside by Hayden Folker | https://soundcloud.com/hayden-folker
 Music promoted by https://www.free-stock-music.com
