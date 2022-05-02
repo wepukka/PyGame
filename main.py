@@ -6,14 +6,13 @@ from TargetPractice import *
 from datetime import date
 from handleDb import *
 
-from index import * # https://github.com/eugene-eeo/tinyindex
-
 clock = pygame.time.Clock()
 pygame.init()
 
 today = date.today()
 FPS = 60 # ENOUGH FPS TO HANDLE MOUSE INPUT
 WIDTH, HEIGHT = 1600, 900
+MAX_TARGETS = 20 # MAX TARGETS ON SCREEN
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
 
 # BUTTON IMAGES
@@ -27,7 +26,7 @@ WHITE = (255, 255,255)
 BLACK = (0,0,0)
 
 # FONTS FOR DRAW_TEXT FUNCTION
-font = pygame.font.SysFont(None, 20)
+normal_font = pygame.font.SysFont(None, 20)
 big_font = pygame.font.SysFont(None, 40)
 
 def draw_text(text, font, color, surface, x, y):
@@ -36,33 +35,45 @@ def draw_text(text, font, color, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
     
-def draw_high_scores(hs_list): # TOP 3 SCORES
-    draw_text("TOP 3", big_font, WHITE, WIN, WIDTH/2 +400, HEIGHT/2-100)
+def draw_high_scores(scores): # TOP SCORES
+    draw_text("TOP 5", big_font, WHITE, WIN, WIDTH/2 +400, HEIGHT/2-100)
     draw_text("Score", big_font, WHITE, WIN, WIDTH/2 +300, HEIGHT/2-50)
     draw_text("Accuracy", big_font, WHITE, WIN, WIDTH/2 + 500, HEIGHT/2-50)
     HS_X = WIDTH/2 + 325
     HS_Y = HEIGHT/2 
-    if len(hs_list) >= 3:
-        for i in range(3):
-            draw_text(str(hs_list[i]["score"]), big_font, WHITE, WIN, HS_X, HS_Y)
-            draw_text(str(int(hs_list[i]["accuracy"])) + "%", big_font, WHITE, WIN, HS_X + 200, HS_Y)
-            HS_Y += 50
     
-hs_list = []
-idx = Index(db, 'score', reverse=True) # sort index by score
-for item in idx:
-    hs_list.append(item)
+    # Print top scores 
+    length = len(scores)
+    if length > 5:
+        length = 5
+    else:
+        length = length
+        
+    for i in range(length):
+        draw_text(str(scores[i]["score"]), big_font, WHITE, WIN, HS_X, HS_Y)
+        draw_text(str(int(scores[i]["accuracy"])) + "%", big_font, WHITE, WIN, HS_X + 200, HS_Y)
+        HS_Y += 50 # Change y axis for each
 
 click = False
 def main_menu(): # LAUNCHES ON STARTUP
     mixer.music.load(os.path.join("assets", "hayden-folker-cast-aside.wav"))
-    mixer.music.play(-1)
+    mixer.music.play(-1) # LOOP
+    
     pygame.display.set_caption('MENU')
-
+    
+    scores = search_all() # SORT BY SCORE
+    for i in range(len(scores)):
+        key = scores[i]
+        j = i-1
+        while j >= 0 and key["score"] > scores[j]["score"] :
+            scores[j+1] = scores[j]
+            j -= 1
+        scores[j+1] = key
+        
     while True:
         WIN.fill((BLACK))
         
-        draw_high_scores(hs_list)        
+        draw_high_scores(scores)        
         
         mouse_x, mouse_y = pygame.mouse.get_pos()
         button_1 = pygame.Rect(WIDTH/2-100, HEIGHT/2 -100, 200, 50)
@@ -127,7 +138,6 @@ def options(): # Options for music
         pygame.display.update()
         clock.tick(FPS)
         
-        
 def play(): # Game
     pygame.display.set_caption('Target Practice')
     click_amount = 0
@@ -150,7 +160,7 @@ def play(): # Game
             if event.type == KEYDOWN:
                 if event.key != 1: # other then mouse input will return to menu
                     running = False
-                if event.key != 1 and game_over: # if game is over, save score
+                if event.key != 1 and game_over: # game over, save score
                     save_score(score,hit_accuracy,today)
                     running = False
             elif event.type == timer_event: # every second add new target
@@ -165,7 +175,7 @@ def play(): # Game
                     score += 1
                     hit_accuracy = score / click_amount
                     
-            if len(targets) > 20: # If targets > x in screen, game over
+            if len(targets) > MAX_TARGETS: # If targets > x in screen, game over
                 game_over = True
       
         text = handle_text(font,score,hit_accuracy, game_over) # accuracy and score during game and game over
