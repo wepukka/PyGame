@@ -1,5 +1,3 @@
-
-
 import pygame, sys;
 from pygame import *
 from targetPractice import *
@@ -9,6 +7,8 @@ from handleDb import *
 clock = pygame.time.Clock()
 pygame.init()
 
+
+#
 today = date.today()
 FPS = 60 # ENOUGH FPS TO HANDLE MOUSE INPUT
 WIDTH, HEIGHT = 1600, 900
